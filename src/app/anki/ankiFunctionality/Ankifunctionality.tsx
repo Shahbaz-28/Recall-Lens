@@ -25,13 +25,18 @@ const Ankifunctionality = () => {
 	const [loading, setLoading] = useState(true);
 	const [isFetched, setIsFetched] = useState(true);
 
+	// TEMP-AUTH-BYPASS: use a fake token instead of the Firebase user's ID token
 	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, async (user) => {
-			if (!user) return;
-			setToken(await user.getIdToken());
-		});
-		return () => unsubscribe();
+		setToken("dev-bypass");
 	}, []);
+	// TEMP-AUTH-BYPASS: original code below, restore when Firebase Auth is configured
+	// useEffect(() => {
+	// 	const unsubscribe = onAuthStateChanged(auth, async (user) => {
+	// 		if (!user) return;
+	// 		setToken(await user.getIdToken());
+	// 	});
+	// 	return () => unsubscribe();
+	// }, []);
 
 	useEffect(() => {
 		if (!token) return;

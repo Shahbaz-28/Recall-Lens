@@ -5,14 +5,19 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 const Home = () => {
 	const router = useRouter();
+	// TEMP-AUTH-BYPASS: skip login and go straight to /decks
 	useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                router.push("/anki");
-            }
-        });
-        return () => unsubscribe();
-    }, [router]);
+		router.push("/decks");
+	}, [router]);
+	// TEMP-AUTH-BYPASS: original code below, restore when Firebase Auth is configured
+	// useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+    //         if (user) {
+    //             router.push("/anki");
+    //         }
+    //     });
+    //     return () => unsubscribe();
+    // }, [router]);
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 p-4">
 			<div className="bg-slate-800 shadow-2xl rounded-lg p-12 w-full max-w-2xl border border-slate-600 text-center">

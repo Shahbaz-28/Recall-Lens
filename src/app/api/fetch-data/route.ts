@@ -22,8 +22,10 @@ export const POST = async (req: NextRequest) => {
 					status: 401,
 				}
 			);
-		const decode = await adminAuth.verifyIdToken(token);
-		const uid = decode.uid;
+		// TEMP-AUTH-BYPASS: use a fixed dev user instead of verifying the token
+		const uid = "dev-user";
+		// const decode = await adminAuth.verifyIdToken(token);
+		// const uid = decode.uid;
 		const userInfo = await fetchUserInfo(uid, desiredAmount);
 		let pastLearntWords = [];
 		const redisCalls = userInfo.map(async (word) => {

@@ -23,9 +23,11 @@ const LogOut = () => {
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
-			if (!user) {
-				return router.push("/auth/signIn");
-			}
+			// TEMP-AUTH-BYPASS: don't redirect to sign-in when logged out
+			// if (!user) {
+			// 	return router.push("/auth/signIn");
+			// }
+			if (!user) return;
 			setUser(user);
 		});
 		return () => unsubscribe();
@@ -142,6 +144,19 @@ const LogOut = () => {
 
 				{/* Navigation Buttons - Right Side */}
 				<div className="flex items-center gap-3">
+					<button
+						onClick={() => {
+							router.push("/decks");
+						}}
+						disabled={pathname === "/decks"}
+						className={`${
+							pathname === "/decks"
+								? "bg-gray-600 text-gray-300 cursor-not-allowed border-gray-400"
+								: "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white border-white/30 hover:border-white/50"
+						} font-semibold py-2 px-4 sm:px-6 rounded-lg sm:rounded-xl border-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm min-w-[80px] sm:min-w-[100px] disabled:transform-none disabled:hover:scale-100`}
+					>
+						Decks
+					</button>
 					<button
 						onClick={() => {
 							router.push("/anki");

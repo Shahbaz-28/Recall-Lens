@@ -20,8 +20,10 @@ export const PATCH = async (req: NextRequest) => {
 				status: 401,
 			}
 		);
-	const decode = await adminAuth.verifyIdToken(token);
-	const uid = decode.uid;
+	// TEMP-AUTH-BYPASS: use a fixed dev user instead of verifying the token
+	const uid = "dev-user";
+	// const decode = await adminAuth.verifyIdToken(token);
+	// const uid = decode.uid;
 	try {
 		await updateStudyLater(uid, idAndDifficultyArr);
 		return NextResponse.json({ status: 200 });
