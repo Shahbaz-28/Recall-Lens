@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import AddCardDialog from "./AddCardDialog";
 import { ui } from "@/components/ui";
 import { PencilIcon, PlayIcon, PlusIcon, StackIcon, TrashIcon } from "@/components/icons";
 import { api } from "@/lib/apiClient";
@@ -25,6 +26,7 @@ const DecksPage = () => {
 	const [renameValue, setRenameValue] = useState("");
 	const [deckToDelete, setDeckToDelete] = useState<DeckSummary | null>(null);
 	const [deleting, setDeleting] = useState(false);
+	const [showAddCard, setShowAddCard] = useState(false);
 
 	const loadDecks = useCallback(async () => {
 		try {
@@ -100,9 +102,14 @@ const DecksPage = () => {
 						<h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Decks</h1>
 						<p className="mt-1 text-sm text-muted">Review what&apos;s due today and keep your memory sharp.</p>
 					</div>
-					<button onClick={() => setShowCreate((open) => !open)} className={ui.buttonPrimary}>
-						<PlusIcon /> New deck
-					</button>
+					<div className="flex gap-2">
+						<button onClick={() => setShowCreate((open) => !open)} className={ui.buttonSecondary}>
+							<StackIcon /> New deck
+						</button>
+						<button onClick={() => setShowAddCard(true)} disabled={decks === null} className={ui.buttonPrimary}>
+							<PlusIcon /> Add card
+						</button>
+					</div>
 				</div>
 
 				{showCreate && (
@@ -243,6 +250,18 @@ const DecksPage = () => {
 					</ul>
 				</section>
 			</main>
+
+			{showAddCard && decks && (
+				<AddCardDialog
+					decks={decks}
+					onClose={() => setShowAddCard(false)}
+					onAdded={loadDecks}
+					onCreateDeck={() => {
+						setShowAddCard(false);
+						setShowCreate(true);
+					}}
+				/>
+			)}
 
 			<ConfirmDialog
 				open={deckToDelete !== null}

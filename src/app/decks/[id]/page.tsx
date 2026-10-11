@@ -11,6 +11,7 @@ import { api } from "@/lib/apiClient";
 import type { CardItem, DeckSummary } from "@/lib/types";
 import { CardTag } from "@/lib/cardTags";
 import CardMetaFields, { SubtopicChip, TagBadge } from "./CardMetaFields";
+import AddCardForm from "../AddCardForm";
 
 const STATE_LABELS = ["New", "Learning", "Review", "Relearning"];
 
@@ -42,15 +43,6 @@ const DeckPage = () => {
 	const [deck, setDeck] = useState<DeckSummary | null>(null);
 	const [cards, setCards] = useState<CardItem[] | null>(null);
 	const [error, setError] = useState("");
-	const [front, setFront] = useState("");
-	const [back, setBack] = useState("");
-	const [frontImage, setFrontImage] = useState<string | null>(null);
-	const [backImage, setBackImage] = useState<string | null>(null);
-	const [frontUploading, setFrontUploading] = useState(false);
-	const [backUploading, setBackUploading] = useState(false);
-	const [tag, setTag] = useState<CardTag | "">("");
-	const [subtopics, setSubtopics] = useState<string[]>([]);
-	const [adding, setAdding] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editFront, setEditFront] = useState("");
 	const [editBack, setEditBack] = useState("");
@@ -64,12 +56,6 @@ const DeckPage = () => {
 	const [deleting, setDeleting] = useState(false);
 
 	// Each side needs text or an image; wait for uploads to finish before saving
-	const canAdd =
-		Boolean(front.trim() || frontImage) &&
-		Boolean(back.trim() || backImage) &&
-		Boolean(tag) &&
-		!frontUploading &&
-		!backUploading;
 	const canSaveEdit =
 		Boolean(editFront.trim() || editFrontImage) &&
 		Boolean(editBack.trim() || editBackImage) &&
@@ -94,29 +80,6 @@ const DeckPage = () => {
 	useEffect(() => {
 		load();
 	}, [load]);
-
-	const addCard = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!canAdd) return;
-		setAdding(true);
-		try {
-			await api(`/api/decks/${id}/cards`, {
-				method: "POST",
-				body: { front, back, frontImage, backImage, tag, subtopics },
-			});
-			setFront("");
-			setBack("");
-			setFrontImage(null);
-			setBackImage(null);
-			setTag("");
-			setSubtopics([]);
-			await load();
-		} catch (e) {
-			setError((e as Error).message);
-		} finally {
-			setAdding(false);
-		}
-	};
 
 	const saveEdit = async (cardId: string) => {
 		if (!canSaveEdit) return;
@@ -200,67 +163,17 @@ const DeckPage = () => {
 				</div>
 
 				<div className="mt-8 grid gap-6 lg:grid-cols-[22rem_1fr] lg:items-start">
-					<form onSubmit={addCard} className={`${ui.panel} space-y-4 p-5 lg:sticky lg:top-20`}>
-						<div>
-							<h2 className="font-semibold">Add a card</h2>
-							<p className="mt-0.5 text-xs text-muted">Write a question and its answer.</p>
-						</div>
-						<div>
-							<label htmlFor="card-front" className={ui.label}>
-								Front
-							</label>
-							<textarea
-								id="card-front"
-								value={front}
-								onChange={(e) => setFront(e.target.value)}
-								placeholder="Question"
-								rows={3}
-								className={textareaClass}
-							/>
-							<div className="mt-2">
-								<ImageInput
-									label="front image"
-									value={frontImage}
-									onChange={setFrontImage}
-									onBusyChange={setFrontUploading}
-								/>
+					<AddCardForm
+						deckId={id}
+						onAdded={load}
+						className={`${ui.panel} p-5 lg:sticky lg:top-20`}
+						header={
+							<div>
+								<h2 className="font-semibold">Add a card</h2>
+								<p className="mt-0.5 text-xs text-muted">Write a question and its answer.</p>
 							</div>
-						</div>
-						<div>
-							<label htmlFor="card-back" className={ui.label}>
-								Back
-							</label>
-							<textarea
-								id="card-back"
-								value={back}
-								onChange={(e) => setBack(e.target.value)}
-								placeholder="Answer"
-								rows={3}
-								className={textareaClass}
-							/>
-							<div className="mt-2">
-								<ImageInput
-									label="back image"
-									value={backImage}
-									onChange={setBackImage}
-									onBusyChange={setBackUploading}
-								/>
-							</div>
-						</div>
-						<CardMetaFields
-							tag={tag}
-							onTagChange={setTag}
-							subtopics={subtopics}
-							onSubtopicsChange={setSubtopics}
-						/>
-						<button
-							type="submit"
-							disabled={adding || !canAdd}
-							className={`${ui.buttonPrimary} w-full`}
-						>
-							{adding ? "Adding…" : "Add card"}
-						</button>
-					</form>
+						}
+					/>
 
 					<section>
 						<div className="mb-3 flex items-baseline justify-between">
